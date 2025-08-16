@@ -1,40 +1,87 @@
 import tkinter as tk
 from tkinter import ttk
 from db import get_db_connection
-# ---------- Faculty Login ----------
-import tkinter as tk
-from db import get_db_connection
+from tkinter import *
 from tkinter import messagebox
 
-# ---------- Faculty Login ----------
-def faculty_login():
-    root.configure(bg="#f0f4f7")
-    
-    root.title("Faculty Login")  # Change title
+
+def create_login_card(title, login_action, back_action, extra_btn=None):
+    # Clear previous
     for widget in root.winfo_children():
         widget.destroy()
 
-    tk.Label(root, text="Faculty Login", font=("Arial", 20)).pack(pady=20)
+    # Container
+    container = tk.Frame(root, bg="#f0f4f7")
+    container.pack(expand=True, fill="both")
 
-    tk.Label(root, text="Email").pack()
-    email_entry = tk.Entry(root)
-    email_entry.pack()
+    # Shadow effect
+    shadow = tk.Frame(container, bg="#d6d6d6")
+    shadow.place(relx=0.5, rely=0.5, anchor="center", width=420, height=420)
 
-    tk.Label(root, text="Password").pack()
-    password_entry = tk.Entry(root, show="*")
-    password_entry.pack()
+    # Card
+    card = tk.Frame(container, bg="white", bd=0, relief="ridge")
+    card.place(relx=0.5, rely=0.5, anchor="center", width=400, height=400)
 
-    # Login button now calls function with the entry values
-    tk.Button(
-        root,
-        text="Login",
-        width=20,
-        command=lambda: faculty_login_action(email_entry.get(), password_entry.get())
-    ).pack(pady=10)
+    # Title
+    tk.Label(card, text=title, font=("Helvetica", 20, "bold"),
+             bg="white", fg="#004225").pack(pady=(30, 20))
 
-    tk.Button(root, text="Back", width=20, command=main_menu).pack(pady=20)
+    # Email field
+    tk.Label(card, text="Email", bg="white", fg="black", 
+             font=("Helvetica", 10)).pack(pady=(0, 5))
+    email_entry = tk.Entry(card, width=30, font=("Helvetica", 11), bd=1, relief="solid")
+    email_entry.pack(pady=(0, 15))
+
+    # Password field
+    tk.Label(card, text="Password", bg="white", fg="black",
+             font=("Helvetica", 10)).pack(pady=(0, 5))
+    password_entry = tk.Entry(card, show="*", width=30, font=("Helvetica", 11), bd=1, relief="solid")
+    password_entry.pack(pady=(0, 10))
+
+    # Show/Hide password toggle
+    def toggle_password():
+        if password_entry.cget('show') == '*':
+            password_entry.config(show='')
+            eye_btn.config(text="Hide")
+        else:
+            password_entry.config(show='*')
+            eye_btn.config(text="Show")
+
+    eye_btn = tk.Button(card, text="Show", command=toggle_password, 
+                        bg="white", fg="#004225", bd=0, cursor="hand2",
+                        font=("Helvetica", 8))
+    eye_btn.pack(pady=(0, 15))
+
+    # Hover button factory
+    def create_hover_btn(text, bg_color, hover_color, command, pady=5):
+        btn = tk.Button(card, text=text, bg=bg_color, fg="white",
+                        font=("Helvetica", 12, "bold"), width=25, height=2,
+                        bd=0, command=command, cursor="hand2")
+        btn.pack(pady=pady)
+        btn.bind("<Enter>", lambda e: btn.config(bg=hover_color))
+        btn.bind("<Leave>", lambda e: btn.config(bg=bg_color))
+        return btn
+
+    # Buttons
+    create_hover_btn("Login", "#074d51", "#086752",
+                     lambda: login_action(email_entry.get(), password_entry.get()), pady=5)
+
+    if extra_btn:  # যেমন Student এ Registration আছে
+        create_hover_btn(extra_btn["text"], extra_btn["bg"], extra_btn["hover"], extra_btn["command"], pady=5)
+
+    create_hover_btn("Back", "#757575", "#424242", back_action, pady=5)
 
 
+# ---------- Faculty Login ----------
+def faculty_login():
+    create_login_card(
+        "Faculty Login",
+        faculty_login_action,
+        main_menu
+    )
+
+
+# ---------- Faculty Login ----------
 def faculty_login_action(email, password):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -47,8 +94,9 @@ def faculty_login_action(email, password):
 
     if user:
         messagebox.showinfo("Login Successful", f"Welcome {user['name']}")
-        print(user, "user data got")
-        
+        import faculty_pannel
+        faculty_pannel.open_faculty_pannel(root, user['name'], user.get('designation','id'))
+   
     else:
         messagebox.showerror("Login Failed", "Invalid email or password")
 
@@ -211,29 +259,24 @@ def student_registration():
               width=15, command=validate_and_register).pack(side=tk.LEFT, padx=10)
     
     tk.Button(btn_frame, text="Back", bg="#f44336", fg="white", font=("Helvetica", 12, "bold"),
-              width=15, command=student_menu).pack(side=tk.LEFT, padx=10)
+              width=15, command=student_login).pack(side=tk.LEFT, padx=10)
 
 
-# ---------- Student Login ----------
+
+
 def student_login():
-    root.configure(bg="#f0f4f7")
-    root.title("Student Login")  # Change title
-    for widget in root.winfo_children():
-        widget.destroy()
-
-    tk.Label(root, text="Student Login", font=("Arial", 20)).pack(pady=20)
-
-    tk.Label(root, text="Email").pack()
-    email_entry = tk.Entry(root)
-    email_entry.pack()
-
-    tk.Label(root, text="Password").pack()
-    password_entry = tk.Entry(root, show="*")
-    password_entry.pack()
-
-    tk.Button(root, text="Login", width=20, command=lambda: student_login_action(email_entry.get(), password_entry.get())).pack(pady=10)
-    tk.Button(root, text="Back", width=20, command=student_menu).pack(pady=20)
-
+    create_login_card(
+        "Student Login",
+        student_login_action,
+        main_menu,
+        extra_btn={
+            "text": "Registration",
+            "bg": "#079A5F",
+            "hover": "#046c43",
+            "command": student_registration
+        }
+    )
+    
 def student_login_action(email, password):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -246,22 +289,9 @@ def student_login_action(email, password):
 
     if user:
         messagebox.showinfo("Login Successful", f"Welcome {user['name']}")
-        print(user, "user data got")
-        
     else:
         messagebox.showerror("Login Failed", "Invalid email or password")
 
-
-# ---------- Student Menu ----------
-def student_menu():
-    root.title("Student Panel")  # Change title
-    for widget in root.winfo_children():
-        widget.destroy()
-
-    tk.Label(root, text="Student Panel", font=("Arial", 20)).pack(pady=20)
-    tk.Button(root, text="Login", width=20, command=student_login).pack(pady=10)
-    tk.Button(root, text="Registration", width=20, command=student_registration).pack(pady=10)
-    tk.Button(root, text="Back", width=20, command=main_menu).pack(pady=20)
 
 
 # ---------- Main Menu ----------
@@ -313,7 +343,7 @@ def main_menu():
         return btn
     
     create_button("Faculty", "#4CAF50", "#45a049", faculty_login)
-    create_button("Student", "#2196F3", "#1e88e5", student_menu)
+    create_button("Student", "#2196F3", "#1e88e5", student_login)
     
     # Footer
     tk.Label(root, text="© 2025 Academic Management System", font=("Helvetica", 10),
