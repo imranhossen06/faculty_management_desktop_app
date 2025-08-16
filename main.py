@@ -95,7 +95,7 @@ def faculty_login_action(email, password):
     if user:
         messagebox.showinfo("Login Successful", f"Welcome {user['name']}")
         import faculty_pannel
-        faculty_pannel.open_faculty_pannel(root, user['name'], user.get('designation','id'))
+        faculty_pannel.open_faculty_pannel(root, user['name'], user.get('designation'), user.get('id'))
    
     else:
         messagebox.showerror("Login Failed", "Invalid email or password")

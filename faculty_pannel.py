@@ -1,8 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font
+from tkinter import font, messagebox
 
-def open_faculty_pannel(root, faculty_name, faculty_designation,faculty_id):
+
+def open_faculty_pannel(root, faculty_name, faculty_designation, faculty_id):
     # ===== Clear previous widgets (from login page) =====
     for widget in root.winfo_children():
         widget.destroy()
@@ -11,66 +13,20 @@ def open_faculty_pannel(root, faculty_name, faculty_designation,faculty_id):
     root.geometry("1100x650")
     root.configure(bg="#f0f2f5")
 
-    # Center helper
-    def center(win):
-        win.update_idletasks()
-        w = win.winfo_width()
-        h = win.winfo_height()
-        ws = win.winfo_screenwidth()
-        hs = win.winfo_screenheight()
-        x = (ws // 2) - (w // 2)
-        y = (hs // 2) - (h // 2)
-        win.geometry(f'{w}x{h}+{x}+{y}')
-
     # Fonts & Styles
     heading_font = font.Font(family="Helvetica", size=12, weight="bold")
     big_font = font.Font(family="Helvetica", size=14, weight="bold")
     small_font = font.Font(family="Helvetica", size=10)
 
-    style = ttk.Style()
-    style.theme_use('default')
-
     # ================= Sidebar =================
     sidebar = tk.Frame(root, bg="#0b4d2e", width=240)
     sidebar.pack(side="left", fill="y")
 
-    # Logo area
-    logo_frame = tk.Frame(sidebar, bg="#0b4d2e")
-    logo_frame.pack(fill="x", pady=20)
-    logo_label = tk.Label(logo_frame, text="BUBT", bg="#0b4d2e", fg="white",
-                        font=("Helvetica", 20, "bold"))
-    logo_label.pack(padx=20, anchor="w")
-    sub_label = tk.Label(logo_frame, text="FACULTY PANEL", bg="#0b4d2e", fg="#cfead7",
-                        font=("Helvetica", 9))
-    sub_label.pack(padx=20, anchor="w")
-
-    # Menu buttons
-    menu_frame = tk.Frame(sidebar, bg="#0b4d2e")
-    menu_frame.pack(fill="both", expand=True, padx=10, pady=10)
-
-    menu_items = [
-        ("Dashboard", lambda: print("Dashboard clicked")),
-        ("Appointment", lambda: print("Appointment clicked")),
-        ("Classroom", lambda: print("Classroom clicked")),
-        ("Support", lambda: print("Support clicked")),
-        ("Configuration", lambda: print("Configuration clicked"))
-    ]
-
-    for text, cmd in menu_items:
-        b = tk.Button(menu_frame, text=text, anchor="w", command=cmd,
-                    bg="#0b4d2e", fg="white", relief="flat", bd=0,
-                    activebackground="#0a3f24", padx=12)
-        b.pack(fill="x", pady=6)
-
-    # Footer
-    footer = tk.Label(sidebar, text="© 2025 BUBT Fantastic5 All Rights Reserved",
-                    bg="#0b4d2e", fg="#a6d1c0", font=small_font)
-    footer.pack(side="bottom", pady=20)
-
-    # ================= Topbar =================
+    # ================= Main Area =================
     main_area = tk.Frame(root, bg="#f0f2f5")
     main_area.pack(side="left", fill="both", expand=True)
 
+    # --- Topbar ---
     topbar = tk.Frame(main_area, bg="white", height=70)
     topbar.pack(fill="x")
     topbar.pack_propagate(False)
@@ -79,7 +35,6 @@ def open_faculty_pannel(root, faculty_name, faculty_designation,faculty_id):
                         font=heading_font)
     greeting.pack(side="left", padx=20)
 
-    # profile compact at top right
     profile_frame = tk.Frame(topbar, bg="white")
     profile_frame.pack(side="right", padx=20)
     profile_name = tk.Label(profile_frame, text=faculty_name, bg="white", font=big_font)
@@ -87,55 +42,176 @@ def open_faculty_pannel(root, faculty_name, faculty_designation,faculty_id):
     profile_name.pack(anchor="e")
     profile_role.pack(anchor="e")
 
-    # ================= Content Area =================
+    # --- Content area (dynamic load হবে) ---
     content = tk.Frame(main_area, bg="#f0f2f5")
     content.pack(fill="both", expand=True, padx=20, pady=10)
 
-    # Profile card
-    profile_card = tk.Frame(content, bg="white", bd=1, relief="solid", height=80)
-    profile_card.pack(fill="x", padx=10, pady=10)
-    profile_card.pack_propagate(False)
+    # ================= Helper functions =================
+    def clear_content():
+        for w in content.winfo_children():
+            w.destroy()
 
-    # inside profile card
-    left_profile = tk.Frame(profile_card, bg="white")
-    left_profile.pack(side="left", padx=10, pady=10)
-    avatar = tk.Canvas(left_profile, width=50, height=50, bg="#e9ecef", highlightthickness=0)
-    avatar.create_oval(5, 5, 45, 45, fill="#cfead7", outline="#b6e0c9")
-    avatar.pack(side="left", padx=10)
-    name_label = tk.Label(left_profile, text=faculty_name, bg="white", font=big_font)
-    role_label = tk.Label(left_profile, text=faculty_role, bg="white", fg="#6c757d", font=small_font)
-    name_label.pack(anchor="w")
-    role_label.pack(anchor="w")
+    # ---------------- Dashboard ----------------
+    def show_dashboard():
+        clear_content()
 
-    right_profile = tk.Frame(profile_card, bg="white")
-    right_profile.pack(side="right", padx=10, pady=10)
-    for i in range(3):
-        dot = tk.Label(right_profile, text="⚙", bg="white", font=("Helvetica", 12))
-        dot.pack(side="left", padx=6)
+        tk.Label(content, text="📊 Dashboard", font=big_font, bg="#f0f2f5").pack(anchor="w")
 
-    # ================= Stats cards area =================
-    stats_frame = tk.Frame(content, bg="#f0f2f5")
-    stats_frame.pack(fill="x", padx=10, pady=10)
+        stats = [
+            ("👨‍🎓 Total Appointment", "120"),
+            ("📅 Appointments", "15"),
+            ("🏫 Pending", "8"),
+            ("💬 Approved", "23"),
+            ("💬 Rejected", "4"),
+            ("💬 Canceled", "2"),
+        ]
 
-    stats = [
-        ("In Total", "30", "#ffffff"),
-        ("Approved", "25", "#e7f9ef"),
-        ("Pending", "2", "#fff7e6"),
-        ("Rejected", "2", "#ffecec"),
-        ("Cancelled", "1", "#f0f0f0")
+        grid = tk.Frame(content, bg="#f0f2f5")
+        grid.pack(fill="both", expand=True, padx=20, pady=20)
+
+        def make_stat_card(parent, title, value):
+            card = tk.Frame(parent, bg="white", width=220, height=120, relief="raised", bd=1)
+            card.pack_propagate(False)
+
+            tk.Label(card, text=title, font=("Helvetica", 12), bg="white", fg="#555").pack(pady=(15, 5))
+            tk.Label(card, text=value, font=("Helvetica", 20, "bold"), bg="white", fg="#0b4d2e").pack()
+
+            return card
+
+        for i, (title, value) in enumerate(stats):
+            card = make_stat_card(grid, title, value)
+            card.grid(row=0, column=i, padx=12, pady=12, sticky="nsew")
+
+        for i in range(len(stats)):
+            grid.grid_columnconfigure(i, weight=1)
+
+    # ---------------- Counselling Hours ----------------
+    def show_counselling_hours():
+        clear_content()
+        tk.Label(content, text="🕒 Counselling Hours", font=big_font, bg="#f0f2f5").pack(anchor="w")
+
+        # Default data
+        days = [
+            ("Monday", "Open", "9:00 AM - 5:00 PM"),
+            ("Tuesday", "Open", "10:00 AM - 4:00 PM"),
+            ("Wednesday", "Open", "11:00 AM - 6:00 PM"),
+            ("Thursday", "Open", "9:00 AM - 5:00 PM"),
+            ("Friday", "Closed", ""),
+            ("Saturday", "Open", "12:00 PM - 3:00 PM"),
+            ("Sunday", "Closed", ""),
+        ]
+
+        grid = tk.Frame(content, bg="#f0f2f5")
+        grid.pack(fill="both", expand=True, padx=10, pady=10)
+
+        entries = {}  # store {day: (status_var, entry)}
+
+        for i, (day, status, time) in enumerate(days):
+            # --- Card ---
+            card = tk.Frame(grid, bg="white", relief="raised", bd=1, width=300, height=100)
+            card.grid(row=i // 2, column=i % 2, padx=12, pady=12, sticky="nsew")
+            card.pack_propagate(False)
+
+            # Day name
+            tk.Label(card, text=day, font=("Helvetica", 12, "bold"), bg="white", fg="#0b4d2e").pack(anchor="w", padx=10, pady=(8, 4))
+
+            inner = tk.Frame(card, bg="white")
+            inner.pack(fill="x", padx=10)
+
+            # Status dropdown
+            status_var = tk.StringVar(value=status)
+            status_menu = tk.OptionMenu(inner, status_var, "Open", "Closed")
+            status_menu.config(width=7, bg="#0b4d2e", fg="white", relief="flat")
+            status_menu.pack(side="left", padx=(0, 10))
+
+            # Time entry
+            time_entry = tk.Entry(inner, width=20)
+            time_entry.insert(0, time)
+            time_entry.pack(side="left")
+
+            entries[day] = (status_var, time_entry)
+
+    def save_hours():
+        updated = {}
+        for day, (status_var, entry) in entries.items():
+            status = status_var.get()
+            time = entry.get() if status == "Open" else "Closed"
+            updated[day] = {"status": status, "time": time}
+
+        messagebox.showinfo("Saved", f"Counselling hours updated:\n{updated}")
+
+        tk.Button(content, text="💾 Save Changes", command=save_hours, bg="#0b4d2e", fg="white",
+                relief="flat", padx=12, pady=6).pack(pady=15)
+
+
+    # Default data
+    days = [
+        ("Monday", "Open", "9:00 AM - 5:00 PM"),
+        ("Tuesday", "Open", "10:00 AM - 4:00 PM"),
+        ("Wednesday", "Open", "11:00 AM - 6:00 PM"),
+        ("Thursday", "Open", "9:00 AM - 5:00 PM"),
+        ("Friday", "Closed", ""),
+        ("Saturday", "Open", "12:00 PM - 3:00 PM"),
+        ("Sunday", "Closed", ""),
     ]
 
-    def make_card(parent, title, value, bg):
-        card = tk.Frame(parent, bg=bg, bd=0, relief="ridge", width=170, height=90)
+    grid = tk.Frame(content, bg="#f0f2f5")
+    grid.pack(fill="both", expand=True, padx=10, pady=10)
+
+    entries = {}  # store {day: (status_var, entry)}
+
+    for i, (day, status, time) in enumerate(days):
+        # --- Card ---
+        card = tk.Frame(grid, bg="white", relief="raised", bd=1, width=300, height=100)
+        card.grid(row=i // 2, column=i % 2, padx=12, pady=12, sticky="nsew")
         card.pack_propagate(False)
-        title_lbl = tk.Label(card, text=title, bg=bg, font=small_font)
-        value_lbl = tk.Label(card, text=value, bg=bg, font=("Helvetica", 18, "bold"))
-        title_lbl.pack(anchor="w", padx=10, pady=(10,0))
-        value_lbl.pack(anchor="w", padx=10, pady=(0,10))
-        return card
 
-    for t, v, c in stats:
-        ccard = make_card(stats_frame, t, v, c)
-        ccard.pack(side="left", padx=8)
+        # Day name
+        tk.Label(card, text=day, font=("Helvetica", 12, "bold"), bg="white", fg="#0b4d2e").pack(anchor="w", padx=10, pady=(8, 4))
 
-    center(root)
+        inner = tk.Frame(card, bg="white")
+        inner.pack(fill="x", padx=10)
+
+        # Status dropdown
+        status_var = tk.StringVar(value=status)
+        status_menu = tk.OptionMenu(inner, status_var, "Open", "Closed")
+        status_menu.config(width=7, bg="#0b4d2e", fg="white", relief="flat")
+        status_menu.pack(side="left", padx=(0, 10))
+
+        # Time entry
+        time_entry = tk.Entry(inner, width=20)
+        time_entry.insert(0, time)
+        time_entry.pack(side="left")
+
+        entries[day] = (status_var, time_entry)
+
+    def save_hours():
+        updated = {}
+        for day, (status_var, entry) in entries.items():
+            status = status_var.get()
+            time = entry.get() if status == "Open" else "Closed"
+            updated[day] = {"status": status, "time": time}
+
+        messagebox.showinfo("Saved", f"Counselling hours updated:\n{updated}")
+
+        tk.Button(content, text="💾 Save Changes", command=save_hours, bg="#0b4d2e", fg="white",
+              relief="flat", padx=12, pady=6).pack(pady=15)
+
+    # ================= Sidebar Menu =================
+    menu_items = [
+        ("Dashboard", show_dashboard),
+        ("Appointment", lambda: print("Appointment clicked")),
+        ("Classroom", lambda: print("Classroom clicked")),
+        ("Support", lambda: print("Support clicked")),
+        ("Configuration", lambda: print("Configuration clicked")),
+        ("Counselling Hours", show_counselling_hours),
+    ]
+
+    for text, cmd in menu_items:
+        b = tk.Button(sidebar, text=text, anchor="w", command=cmd,
+                      bg="#0b4d2e", fg="white", relief="flat", bd=0,
+                      activebackground="#0a3f24", padx=12)
+        b.pack(fill="x", pady=6)
+
+    # Default view = Dashboard
+    show_dashboard()
