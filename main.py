@@ -1,39 +1,32 @@
 import tkinter as tk
-import subprocess
+from faculty import faculty
+from student import student
 
-# Faculty login
-def faculty_login():
-    subprocess.Popen(["python", "login.py"])
-
-# Student menu
-def student_menu():
-    # প্রথম স্ক্রিন ক্লিয়ার
-    for widget in root.winfo_children():
-        widget.destroy()
-
-    tk.Label(root, text="Student Panel", font=("Arial", 16)).pack(pady=10)
-
-    tk.Button(root, text="Login", width=20, command=lambda: subprocess.Popen(["python", "login.py"])).pack(pady=5)
-    tk.Button(root, text="Registration", width=20, command=lambda: subprocess.Popen(["python", "registration.py"])).pack(pady=5)
-
-    tk.Button(root, text="Back", width=20, command=main_menu).pack(pady=20)
-
-# Main menu
-def main_menu():
-    # প্রথম স্ক্রিন ক্লিয়ার
-    for widget in root.winfo_children():
-        widget.destroy()
-
-    tk.Label(root, text="Select which panel you want to access", font=("Arial", 16)).pack(pady=10)
-
-    tk.Button(root, text="Faculty", width=20, command=faculty_login).pack(pady=5)
-    tk.Button(root, text="Student", width=20, command=student_menu).pack(pady=5)
-
-# Tkinter window
 root = tk.Tk()
-root.title("Main Panel")
+root.title("Academic Management System")
 root.state('zoomed')
 
-main_menu()
+def main_menu(root):
+    for widget in root.winfo_children():
+        widget.destroy()
+    
+    root.configure(bg="#004225")
+    tk.Label(root, text="Academic Management System", font=("Helvetica", 32, "bold"), bg="#004225", fg="white").pack(pady=50)
 
+    def create_button(text, bg_color, hover_color, command):
+        btn = tk.Button(root, text=text, font=("Helvetica", 14, "bold"),
+                        bg=bg_color, fg="white", width=22, height=2, bd=0, command=command, cursor="hand2")
+        btn.pack(pady=20)
+        btn.bind("<Enter>", lambda e: btn.config(bg=hover_color))
+        btn.bind("<Leave>", lambda e: btn.config(bg=bg_color))
+        return btn
+
+    create_button("Faculty", "#4CAF50", "#45a049", lambda: faculty.faculty_login(root, main_menu))
+    
+    
+    create_button("Student", "#2196F3", "#1e88e5", lambda: student.student_login(root, main_menu))
+
+    tk.Label(root, text="© 2025 Academic Management System", font=("Helvetica", 10), bg="#004225", fg="white").pack(side=tk.BOTTOM, pady=15)
+
+main_menu(root)
 root.mainloop()
