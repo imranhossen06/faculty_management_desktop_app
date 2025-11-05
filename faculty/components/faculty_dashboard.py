@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, font
+from faculty.lib.counselling import show_counselling_hours
 
 def open_faculty_dashboard(root, user, main_menu_callback):
     root.title(f"Faculty Dashboard - {user['name']}")
@@ -83,6 +84,7 @@ def open_faculty_dashboard(root, user, main_menu_callback):
     def show_appointment():
         for widget in content_frame.winfo_children():
             widget.destroy()
+        
         tk.Label(content_frame, text="Appointment Content", font=big_font, bg="#f0f2f5").pack(pady=20)
 
     def show_classroom():
@@ -93,7 +95,8 @@ def open_faculty_dashboard(root, user, main_menu_callback):
     def show_counselling():
         for widget in content_frame.winfo_children():
             widget.destroy()
-        tk.Label(content_frame, text="Counselling Hours Content", font=big_font, bg="#f0f2f5").pack(pady=20)
+        show_counselling_hours(content_frame, user['id'])
+        # tk.Label(content_frame, text="Counselling Hours Content", font=big_font, bg="#f0f2f5").pack(pady=20)
 
     def show_support():
         for widget in content_frame.winfo_children():
