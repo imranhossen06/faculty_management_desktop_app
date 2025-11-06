@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, font
 from faculty.lib.counselling import show_counselling_hours
-
+from faculty.components.appointments import show_faculty_appointments
+from db import get_db_connection
 def open_faculty_dashboard(root, user, main_menu_callback):
     root.title(f"Faculty Dashboard - {user['name']}")
 
@@ -48,53 +49,74 @@ def open_faculty_dashboard(root, user, main_menu_callback):
 
     # ================= Functional Menu Buttons =================
     def show_dashboard():
+        
         for widget in content_frame.winfo_children():
             widget.destroy()
-        
-        # Dashboard cards
-        stats_frame = tk.Frame(content_frame, bg="#f0f2f5")
-        stats_frame.pack(fill="x", padx=10, pady=10)
+        tk.Label(content_frame, text="Your Dashboard Overview", bg="#f0f2f5", font=big_font).pack(pady=20)
+    
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT status, COUNT(*) as total
+            FROM appointments a
+            JOIN counselling_slots c ON a.slot_id = c.id
+            WHERE c.faculty_id = %s
+            GROUP BY status
+        """, (user['id'],))
+        results = cursor.fetchall()
+        conn.close()
+
+        # Prepare counts
+        counts = {"approved": 0, "pending": 0, "rejected": 0, "cancelled": 0}
+        for row in results:
+            counts[row['status']] = row['total']
+
+        total = sum(counts.values())
 
         stats = [
-            ("In Total", "30", "#ffffff", "📊"),
-            ("Approved", "25", "#e7f9ef", "✅"),
-            ("Pending", "2", "#fff7e6", "⏳"),
-            ("Rejected", "2", "#ffecec", "❌"),
-            ("Cancelled", "1", "#f0f0f0", "🚫")
+            ("In Total", total, "#ffffff", "📊"),
+            ("Approved", counts["approved"], "#e7f9ef", "✅"),
+            ("Pending", counts["pending"], "#fff7e6", "⏳"),
+            ("Rejected", counts["rejected"], "#ffecec", "❌"),
+            ("Cancelled", counts["cancelled"], "#f0f0f0", "🚫")
         ]
+
+        stats_frame = tk.Frame(content_frame, bg="#f0f2f5")
+        stats_frame.pack(fill="x", padx=10, pady=10)
 
         def make_card(parent, title, value, bg, icon="📊"):
             card = tk.Frame(parent, bg=bg, bd=0, relief="ridge", width=170, height=90)
             card.pack_propagate(False)
-            icon_lbl = tk.Label(card, text=icon, bg=bg, font=("Helvetica", 14))
-            icon_lbl.pack(anchor="w", padx=10, pady=(10,0))
-            title_lbl = tk.Label(card, text=title, bg=bg, font=small_font)
-            title_lbl.pack(anchor="w", padx=10)
-            value_lbl = tk.Label(card, text=value, bg=bg, font=("Helvetica", 18, "bold"))
-            value_lbl.pack(anchor="w", padx=10, pady=(0,10))
+            tk.Label(card, text=icon, bg=bg, font=("Helvetica", 14)).pack(anchor="w", padx=10, pady=(10,0))
+            tk.Label(card, text=title, bg=bg, font=small_font).pack(anchor="w", padx=10)
+            tk.Label(card, text=value, bg=bg, font=("Helvetica", 18, "bold")).pack(anchor="w", padx=10, pady=(0,10))
             return card
 
         for t, v, c, i in stats:
             ccard = make_card(stats_frame, t, v, c, i)
             ccard.pack(side="left", padx=8)
 
-        # Placeholder label under cards
-        tk.Label(content_frame, text="Additional Dashboard Info Here", bg="#f0f2f5", font=big_font).pack(pady=20)
+        
 
+    
+    
     def show_appointment():
         for widget in content_frame.winfo_children():
             widget.destroy()
-        
-        tk.Label(content_frame, text="Appointment Content", font=big_font, bg="#f0f2f5").pack(pady=20)
+        content_frame.config(bg="white")   # <-- ADD THIS
+        show_faculty_appointments(content_frame, user)
 
     def show_classroom():
         for widget in content_frame.winfo_children():
             widget.destroy()
+        content_frame.config(bg="white") 
         tk.Label(content_frame, text="Classroom Content", font=big_font, bg="#f0f2f5").pack(pady=20)
 
     def show_counselling():
         for widget in content_frame.winfo_children():
             widget.destroy()
+        content_frame.config(bg="white")
         show_counselling_hours(content_frame, user['id'])
         # tk.Label(content_frame, text="Counselling Hours Content", font=big_font, bg="#f0f2f5").pack(pady=20)
 
