@@ -4,14 +4,16 @@ from db import get_db_connection
 from utils.utils import create_login_card
 from faculty.components.faculty_dashboard import open_faculty_dashboard
 def faculty_login(root, main_menu):
-    # Prepare the login callback
-    login_callback = faculty_login_action(root, main_menu)  # this returns the 'action' function
     create_login_card(
         root,
-        "Faculty Login",
-        login_callback,  # pass the returned function
-        main_menu
+        "Student Login",
+        faculty_login_action(root, main_menu),
+        back_action=lambda: main_menu(root)
     )
+   
+    
+    
+     
 
 
 

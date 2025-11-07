@@ -13,7 +13,7 @@ def show_faculty_appointments(content_frame, user):
     cursor = conn.cursor(dictionary=True)
 
     query = """
-        SELECT a.id AS appointment_id, s.name AS student, w.name AS day, c.start_time, c.end_time, a.status
+        SELECT a.id AS appointment_id, s.name AS student, s.intake, s.student_id, s.section, w.name AS day, c.start_time, c.end_time, a.status
         FROM appointments a
         JOIN student s ON a.student_id = s.id
         JOIN counselling_slots c ON a.slot_id = c.id
@@ -25,23 +25,40 @@ def show_faculty_appointments(content_frame, user):
     rows = cursor.fetchall()
     conn.close()
 
-    table = ttk.Treeview(content_frame, columns=("Student","Day","Start","End","Status"), show="headings", height=12)
+    table = ttk.Treeview(
+        content_frame,
+        columns=("Student", "Intake", "Section", "Day", "Start", "End", "Status"),
+        show="headings",
+        height=12
+    )
     table.pack(expand=True, fill="both", padx=20, pady=10)
 
-    table.heading("Student", text="Student")
+    table.heading("Student", text="Student Name")
+    table.heading("Intake", text="Intake")
+    table.heading("Section", text="Section")
     table.heading("Day", text="Day")
     table.heading("Start", text="Start Time")
     table.heading("End", text="End Time")
     table.heading("Status", text="Status")
 
     table.column("Student", width=160, anchor="center")
-    table.column("Day", width=100, anchor="center")
+    table.column("Intake", width=90, anchor="center")
+    table.column("Section", width=90, anchor="center")
+    table.column("Day", width=90, anchor="center")
     table.column("Start", width=120, anchor="center")
     table.column("End", width=120, anchor="center")
     table.column("Status", width=110, anchor="center")
 
     for row in rows:
-        table.insert("", tk.END, iid=row['appointment_id'], values=(row['student'], row['day'], row['start_time'], row['end_time'], row['status']))
+        table.insert("", tk.END, iid=row['appointment_id'], values=(
+            row['student'],
+            row['intake'],
+            row['section'],
+            row['day'],
+            str(row['start_time'])[:-3],
+            str(row['end_time'])[:-3],
+            row['status']
+        ))
 
     action_frame = tk.Frame(content_frame, bg="#f0f2f5")
     action_frame.pack(pady=10)

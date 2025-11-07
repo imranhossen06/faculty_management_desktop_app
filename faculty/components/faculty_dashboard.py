@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, font
 from faculty.lib.counselling import show_counselling_hours
 from faculty.components.appointments import show_faculty_appointments
+from faculty.components.classrooms import show_faculty_classrooms
 from db import get_db_connection
 def open_faculty_dashboard(root, user, main_menu_callback):
     root.title(f"Faculty Dashboard - {user['name']}")
@@ -111,7 +112,7 @@ def open_faculty_dashboard(root, user, main_menu_callback):
         for widget in content_frame.winfo_children():
             widget.destroy()
         content_frame.config(bg="white") 
-        tk.Label(content_frame, text="Classroom Content", font=big_font, bg="#f0f2f5").pack(pady=20)
+        show_faculty_classrooms(content_frame,user)
 
     def show_counselling():
         for widget in content_frame.winfo_children():

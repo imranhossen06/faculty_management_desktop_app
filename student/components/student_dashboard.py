@@ -61,9 +61,13 @@ def open_student_dashboard(root, user, main_menu_callback):
             ("Cancelled", cancelled),
         ]
 
+        
+        stats_frame = tk.Frame(content_frame, bg="#f0f2f5")
+        stats_frame.pack(anchor="n", pady=10)
+
         for title, value in stats:
-            card = tk.Frame(content_frame, bg="white", width=180, height=90, relief="ridge", bd=1)
-            card.pack(side="left", padx=8)
+            card = tk.Frame(stats_frame, bg="white", width=180, height=90, relief="ridge", bd=1)
+            card.pack(side="left", padx=10)
             card.pack_propagate(False)
 
             tk.Label(card, text=title, bg="white", font=small_font).pack(pady=5)
