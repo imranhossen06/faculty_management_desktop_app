@@ -6,7 +6,7 @@ from faculty.components.faculty_dashboard import open_faculty_dashboard
 def faculty_login(root, main_menu):
     create_login_card(
         root,
-        "Student Login",
+        "Faculty Login",
         faculty_login_action(root, main_menu),
         back_action=lambda: main_menu(root)
     )
